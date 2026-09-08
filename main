@@ -1,0 +1,421 @@
+/*
+Finished version 1.
+Test version 15.
+*/
+
+
+//These are necessary libraries from which I use certain aspects.
+#include <iostream>
+#include <time.h>
+#include <string>
+#include <ctime>
+#include <climits>
+
+
+
+using namespace std; // This lets me not have to worry about a lot of unnecessary syntax.
+int WIDTH = 8; // These variables are constant. However, the way I use them later in the code means I can't declare them as constants. I am still using the proper naming convention of using FULL CAPITALS.
+int HEIGHT = 5; // By manipulating these you can change the size of the shape which is used to cover up an item with the "coil". However, the coil needs to also be adjusted in order for that to work properly.
+
+
+bool checkItem(string item, bool itemBool) { // This function will take in a boolean and a string to evaluate the string and return the boolean depending on the string.
+    //Item, is a string which I specifically need to be 2 numbers, each within a certain range. Below, the code checks first the two numbers, and then the range, to determine whether the string can be accepted.
+    int boolTotal = 0; // This is a test to see if each boolean check is passed. If it adds up to 5 at the end then its valid.
+
+
+    if (item.length() == 2) {
+        boolTotal++;
+    } // This ensures the length is limited to 2, which it needs to be to correlate to the location on the vending machine.
+
+
+    if (isdigit(item[0])) {
+        boolTotal++;
+    } // This ensures the first character is a number.
+    if (isdigit(item[1])) {
+        boolTotal++;
+    } // This ensures the second character is a number.
+
+
+    // The code from here to the return line will work as long as the string contains only two numbers, which it does thanks to the code above.
+    int itemPosZero = item[0] - 48; // The range has to be 1-4 as this is the amount of rows.
+    int itemPosOne = item[1] - 48; // The range has to be 1-5 as this is the amount of columns.
+
+
+    for (int i = 1; i <= 4; i++) { // Loops for the amount of rows.
+        if (itemPosZero == i) {
+            boolTotal++; // Checks to see whether the number is between 1-4.
+            break; // Makes the code slightly more efficient by breaking when it finds a valid number instead of checking the rest.
+        }
+    }
+    for (int i = 1; i <= 5; i++) { // Loops for the amount of columns.
+        if (itemPosOne == i) {
+            boolTotal++; // checks to see whether the number is between 1-5.
+            break; // Makes the code slightly more efficient by breaking when it finds a valid number instead of checking the rest.
+        }
+    }
+    if (boolTotal == 5) { // This evaluation is the sum of all the boolean checks which all need to be true. Because there are multiple boolean checks which all need to be true to pass, I used the integer boolTotal to count each one.
+        itemBool = true;
+    }
+    return (itemBool); // Returns itemBool, which is only true if the input from the user is valid.
+}
+
+
+
+
+
+
+int locate(int item, int initial) { // This function takes in two integers and returns the first one after changing it. Item is multiplied by 8 and increased by an initial value. When testing, this initial value changed depending on when this function was called. But now, there is less of a need for this function.
+    item = 8 * item;
+    item = item + initial;
+    return (item);
+}
+
+
+int getCoordinates(int coord, string item) { // This function takes in an integer and a string and returns the integer.
+    int itemX = (int)item[coord] - 48; // The integer, coord, is passed into this function as 2 different numbers, 0 and 1, which refer to the position of string that the user has entered.
+    int itemY = (int)item[coord] - 48; // Take 48 off the number is needed in order to convert to the proper ASCII character.
+
+
+    int initial = -6; // Relatively arbitrary number which would change depending on the size of the ASCII art.
+    itemX = locate(itemX, initial); // Manipulate the item value using the function locate.
+    itemY = locate(itemY, initial);
+
+
+    if (coord == 0) {
+        coord = coord + itemX; // Coord will change depending on what value it is passed in as, a 1 or a 0.
+    }
+    else if (coord == 1) {
+        coord = coord + itemY;
+    }
+    return coord;
+
+
+    // Below is the working out I did to find the relationship between the first and the second number. These correlate directly to the x and y, otherwise known as the rows and columns.
+   
+    /*
+   
+    if the first number is 1 then the y is 3. if the second number is 1 then the x is 4
+    if the first number is 2 then the y is 11. if the second number is 2 then the x is 12
+    if the fist number is 3 then the y is 19. if the second number is 3 then the x is 20
+    if the first number is 4 then the y is 27. if the second number is 4 then the x is 28
+                                               if the second number is 5 then the x is 36
+
+
+    */
+
+
+    // Notice the second number can be 5 but the first number cannot, due to the difference in rows and columns
+}
+
+
+
+
+int main() { // The main part of the code.
+    char vendingMachineMultiDimensionalArray[40][60]; // Here we initialise the array I will be using to store the vending machine ASCII characters. It won't be used until after the initial use of the string, vendingMachine.
+
+
+    // Here is where you put in the initial money, for testing, I set the number here. But for the actual code, I am using cin, which can be found below to get an integer value from the user.
+    double balance = 0; // The amount of money the user currently has in the vending machine.
+    while (balance <= 0) { // Loops until the customer has a valid balance number.
+        cout << "Please enter credits:" << endl; // Initial money entered into the vending machine.
+        cin >> balance;
+        if (balance > 99.99) { // This check is needed initially here and again inside the main loop later in the main function.
+            balance = 99.99; // I like the idea that the vending machine will just swallow up users' money sometimes, this is similar to that in the sense that if the user had $200 to spend, they would only be able to spend $99 of it.
+        }
+        cin.clear();
+        cin.ignore(INT_MAX, '\n'); // These two lines of code will clear the buffer, allowing the users input to be entered.
+    }
+    string balanceString = to_string(balance); // Converts the integer balance into a string balance in order to print it below in the vending machine.
+    balanceString = balanceString.substr(0, 5); // Limits the amount of the string which can be printed in the vending machine in order for it not to mess with the length of the lines.
+
+
+
+
+
+
+    string vendingMachine = // Sets the string over multiple lines. It could be done on one line but that would be awfully confusing and pointless.
+        " __________________________________________________________ "
+        "|##########################################################|"
+        "|#|\\ /  /  /                         .....  |##############|"
+        "|#|,'`./  / ..--''` |~~``|   \\\\\\\\\\  :     : |##############|"
+        "|#|_\\,'`./  \\     | :    |   /   /  :     : |##----------##|"
+        "|#|__\\,-'`   /___ | | ___|   \\___\\  : ___ : |#| All      |#|"
+        "|#|  /___\\  ./.__\\  |/,__\\   / __\\\\ :/ __\\: |#| Items    |#|"
+        "|#|  \\__//   \\__//   \\__//   \\__//- :\\__//: |#| $1 each  |#|"
+        "|#|===11~0====12~3====13~1====14~1====15~2==|##----------##|"
+        "|#|``````````````````````````````````````z``|##############|"
+        "|#|                                   \\ /   |##############|"
+        "|#|  =====  ..--''` |~~``|    __     --+z   |##|````````\\##|"
+        "|#|  | L |  \\     | :    |   /  \\       \\   |##| E act  |##|"
+        "|#|  |___|   /___ | | ___|  | W__|    ___   |##| Cha ge |##|"
+        "|#|  /=__\\  ./.__\\  |/,__\\  |/,__\\   / __\\  |##| Cnly   |##|"
+        "|#|  \\__//   \\__//   \\__//   \\__//   \\__//  |##|________|##|"
+        "|#|===21~2====22~1====23~2====24~4====25~0==|##############|"
+        "|#|`````````````````````````````````````````|#|  Bal:   |##|"
+        "|#|                                         |#|  $" + balanceString + "  |##|" // balanceString is added here in order to show the user how much is in the machine in a more intuitive way.
+        "|#| =.._      +++    //////      z   =====  |##############|"
+        "|#| \\/  \\     | |    \\    \\      /\\  |   |  |#|`````````|##|"
+        "|#|  \\___\\    |_|    /___ /   ___    |_C_|  |#| _______ |##|"
+        "|#|  / __\\\\  /|_|\\  // __\\   / __\\   /=__\\  |#| |1|2|3| |##|"
+        "|#|  \\__//-  \\|_//  -\\__//   \\__//   \\__//  |#| |4|5|6| |##|"
+        "|#|===31~3====32~3====33~1====34~0====35~3==|#| |7|8|9| |##|"
+        "|#|`````````````````````````````````````````|#| ``````` |##|"
+        "|#|                                         |#|         |##|"
+        "|#| ..--    ______  .--._.   \\.~~./   +++   |#|[=======]|##|"
+        "|#| \\   \\   |    |  |    |    \\   |   | |   |#|  _   _  |##|"
+        "|#|  \\__k\\  : ___:  | ___|    /__ \\   |_|   |#| ||| ( ) |##|"
+        "|#|  / __\\  |/ __\\  // __\\   / __\\/  /|_|\\  |#| |||  `  |##|"
+        "|#|  \\__//   \\__//  \\\\__//  /\\__//   \\|_//  |#|  ~      |##|"
+        "|#|===41~3====42~5====43~1====44~2====45~5==|#|_________|##|"
+        "|#|`````````````````````````````````````````|##############|"
+        "|################################################```````###|"
+        "|#||||||||||||||   |~)| |(~|_|   ||||||||||||####       ###|"
+        "|#||||||||||||||   |  |_|_)| |   ||||||||||||####\\|||||/###|"
+        "|##########################################################|"
+        " \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\              ////////////////////// "
+        "  |_____________________________________________|CR98|___|  ";
+
+
+    // I used find - replace to replace all of the \ characters with \\ because they are special characters and don't show up on their own.
+    // Luckily, in doing this, I found out that they aren't considered into the number of characters either so I was able to print out the vending machine easily.
+    // Find - replace was also used to change the names of variables so they fit convention.
+
+
+
+
+    if (balance >= 10) { // This if - else statement should be ran before printing the array each time, as it allows for single and double digit numbers to be displayed.
+        vendingMachine.erase(vendingMachine.begin() + 1136); // This code removes the extra digits.
+        vendingMachine = vendingMachine + ' '; // This code adds back a space in order to ensure the correct number of characters is maintained.
+    }
+    else {
+        vendingMachine.erase(vendingMachine.begin() + 1134);
+        vendingMachine = vendingMachine + ' ';
+    }
+
+
+
+
+    int count = 0; // A counter which can be reused once reset to 0.
+
+
+    // This code prints the vendingMachine string. It was used in testing in order to distinguish the difference between the string and the array.
+
+
+    /*
+    for (int o = 0; o < 40; o++) {
+        for (int i = 0; i < 60; i++) {
+            cout << vendingMachine[count];
+            count++;
+        }
+        cout << endl;
+    }
+    */
+
+
+    count = 0; // Reset count to 0 to reuse it.
+    for (int o = 0; o < 40; o++) {
+        for (int i = 0; i < 60; i++) {
+            vendingMachineMultiDimensionalArray[o][i] = vendingMachine[count]; // This code populates the array with characters from the string, 1-1.
+            count++;
+        }
+
+
+    }
+    count = 0; // Reset count to 0 to reuse it.
+
+
+
+
+    for (int o = 0; o < 40; o++) { // This nested loop is all which is needed in order to fully print the array.
+        for (int i = 0; i < 60; i++) {
+            cout << vendingMachineMultiDimensionalArray[o][i];
+        }
+        cout << endl; // Prints nothing, but jumps down a line.
+    }
+
+
+
+
+
+
+    char coil[] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '_', '_', '_', ' ', ' ', ' ', ' ', ' ', '/', ' ', '_', '_', '\\', ' ', ' ', ' ', ' ', '\\', '_', '_', '/', '/', ' ', ' ' };
+    // This may not be the best way to do this but by making a string to hold the coil, I am able to use this in the nested loop in order to show the user an item is out of stock.
+    count = 0; // Reset count to 0 to reuse it.
+    int coordX = 1, coordY = 0; // Initialise these coordinates so that we can represent x and y as a 0 and a 1.
+
+
+
+
+
+
+    while (balance > 0) { // This is the loop around the balance (whilst the user still has a balance the code will run).
+       
+        if (balance > 99.99) {
+            balance = 99.99; // I like the idea that the vending machine will just swallow up users' money sometimes, this is similar to that in the sense that if the user had $200 to spend, they would only be able to spend 99 of it.
+        }
+
+
+        string item = "NULLSTRING"; // I was only intending on initialising item here but for some reason it needed to be declared too.
+        bool itemBool = false; // Create a boolean which is false initially to enter loop - true when it has been proven the item entered by a user is valid.
+        while (itemBool == false) { // Loops until the item is valid.
+            cout << "Please enter the number for which item you would like (or enter 99 to return change): " << endl; // I want the user to be only asked to enter 1 number.
+            cin >> item; // Even though its only holding 2 numbers (2 chars, 1 number), it's easier to capture the data as a string.
+
+
+            if (item == "99") { // Exception for the exit code which is set as 99.
+                cout << "This machine does not dispense change, apologies for the inconvenience. Your balance of $" << balanceString << " will be "  << endl;
+                exit(0); // Code which will exit the program immidiately.
+            }
+
+
+            itemBool = checkItem(item, itemBool); // Item is sent off in order to check for its validity.
+        }
+
+
+        srand(time(NULL)); // Sets a random seed or something. I hate random numbers in C++. I spent ages trying to get them to work but this is all that results from my efforts.
+        double randomNumber = (rand() % 100); // Using rand() will get the random number, then the modular function will set the maximum number.
+        randomNumber = randomNumber / 100; // Divide by 100 which which gets me a random number between 0 and 1.
+        balance = balance - randomNumber;
+        balance--; // Ensures balance reduces by at least 1 each time but also adds a bit of randomness to fit the theme of the vending machine being old and tattered and taking the users' money.
+        // I then added the sign on the vending machine letting the user know all items should be $1 each.
+
+
+        string balanceString = to_string(balance); // Update balanceString to be the same as the balance. Then, apply the same substring override which I used previously.
+        if (balance > 9.99) {
+            balanceString = balanceString.substr(0, 5);
+
+
+        }
+        else if (balance < 10) {
+            balanceString = balanceString.substr(0, 4);
+        }
+
+
+        coordX = getCoordinates(coordX, item);
+        coordY = getCoordinates(coordY, item); // Two calls to getCoordinates to get the two different variables used to pinpoint where in the "GUI" needs to be cleared.
+
+
+        int newHEIGHT = HEIGHT + coordY; // This is why HEIGHT and WIDTH aren't proper constants.
+        int newWIDTH = WIDTH + coordX;
+
+
+        // The lines of code below are where I manipulate the array to update the "stock".
+        bool stock = true;
+        int test = 0;
+        for (int o = 0; o < 40; o++) {
+            for (int i = 0; i < 60; i++) {
+                char j = item[0] - 48; // These characters are the ones to be searched for within the array.
+                char n = item[1] - 48;
+                char k = vendingMachineMultiDimensionalArray[o][i] - 48; // These are the characters within the array to be compared to the characters I want to find.
+                char m = vendingMachineMultiDimensionalArray[o][i + 1] - 48;
+                if (j == k && n == m) { // A match is found, meaning I know where in the array to look.
+
+
+                    if (vendingMachineMultiDimensionalArray[o][i + 3] > '1') { // I think the ">" only works because the ASCII for numbers larger than 1 is a bigger integer than the ASCII for 1.
+                        vendingMachineMultiDimensionalArray[o][i + 3] = vendingMachineMultiDimensionalArray[o][i + 3] - 1; // Once I have found the characters, I add 3 along the x axis in order to find the character holding the stock level.
+                        stock = true; // There is stock so no need to override the array with the coil.
+                        cout << "Item number " << item << " dispensed." << endl; // Let the customer know what has been dispensed from the vending machine.
+
+
+                    }
+                    else if (vendingMachineMultiDimensionalArray[o][i + 3] == '0') { // This means the item is out of stock.
+                        cout << "Item number " << item << " out of stock." << endl;
+                    }
+                    else if (vendingMachineMultiDimensionalArray[o][i + 3] == '1') { // This means the item is nearly out of stock, making the only difference in this section as showing the stock as being false.
+                        cout << "Item number " << item << " dispensed." << endl;
+                        vendingMachineMultiDimensionalArray[o][i + 3] = vendingMachineMultiDimensionalArray[o][i + 3] - 1;
+                        stock = false;
+                        // This if - else section of code might not be the best and I think the else is almost redundant but it works so it's staying in.
+
+
+                    }
+                    else {
+                        vendingMachineMultiDimensionalArray[o][i + 3] = vendingMachineMultiDimensionalArray[o][i + 3] - 1;
+                        stock = false;
+                    }
+
+
+                }
+            }
+        }
+
+
+        if (stock == false) { // If stock is false, run the code below to replace the area in the array with the "coil".
+            for (int startingPositionY = coordY; startingPositionY <= newHEIGHT; startingPositionY++) {
+                for (int startingPositionX = coordX; startingPositionX <= newWIDTH; startingPositionX++) {
+
+
+                    vendingMachineMultiDimensionalArray[startingPositionY][startingPositionX] = coil[count]; // Replaces the part in the array with the part in the coil, 1-1.
+                    count++;
+                }
+            }
+        }
+       
+        count = 0; // Reset count to 0 to reuse it.
+        coordX = 1; // Reset coordX to 0 to reuse it.
+        coordY = 0; // Reset coordY to 0 to reuse it.
+
+
+        if (balanceString.length() == 5) { // Checks to see if its a 2 or 3 digit number.
+            for (int c = 50; c < 55; c++) {
+                vendingMachineMultiDimensionalArray[18][c] = balanceString[count]; // Replaces the balance in the ASCII art with the actual balance integer.
+                count++;
+
+
+            }
+        }
+        else {
+            vendingMachineMultiDimensionalArray[18][54] = ' ';
+            for (int c = 50; c < 54; c++) {
+                vendingMachineMultiDimensionalArray[18][c] = balanceString[count];
+                count++;
+
+
+            }
+        }
+        count = 0; // Reset count to 0 to reuse it.
+
+
+
+
+        for (int o = 0; o < 40; o++) {
+            for (int i = 0; i < 60; i++) {
+                cout << vendingMachineMultiDimensionalArray[o][i]; // Reprints the array.
+            }
+            cout << endl;
+        }
+
+
+   
+        while (balance < 0) { // If the balance ever gets below 0, this loop is triggered. It asks the user to add funds as well as actually gets the funds from the user using cin.
+            char extraFundsChar = 'T'; // This is the same situation where I only wanted to initialise the variable but for some reason it also needed to be declared.
+            bool extraFundsBool = false;
+            while (extraFundsChar != 89 && extraFundsChar != 78) { // 89 is Y and 78 is N.
+                cout << "Would you like to add more funds? (Y/N)" << endl;
+                cin >> extraFundsChar;
+                if (extraFundsChar == 'Y') {
+
+
+                    int extraFunds = 0;
+                    while (extraFundsBool == false){
+                        cout << "Please add more money" << endl;
+                        cin >> extraFunds;
+                        if (extraFunds >= 1) { // If the user adds extra funds which are valid, add them to the balance.
+                            extraFundsBool = true;
+                        }
+                        cin.clear();
+                        cin.ignore(INT_MAX, '\n'); // These two lines of code will clear the buffer, allowing the users input to be entered.
+                    }
+                    balance = balance + extraFunds; // Adds the extra funds to the balance
+                }
+                else if (extraFundsChar == 'N') { // Exits the program when the user says no to adding more funds.
+                    exit(0);
+                }
+            }
+            
+        }
+        
+    }
+        return 0;
+
+}
